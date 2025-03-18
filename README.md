@@ -1,6 +1,7 @@
 # Virtual Bank Manager - Conversation Flow
 
 └── Loan_type
+    
     ├── Personal_loan
 
     ├── Home_loan
