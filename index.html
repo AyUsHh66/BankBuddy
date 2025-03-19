@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Loan Center</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .video-container {
+            position: relative;
+            width: 100%;
+            background-color: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        video {
+            width: 100%;
+            display: block;
+        }
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .controls {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            padding: 20px 0;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 12px 24px;
+            margin: 8px;
+            border: none;
+            border-radius: 4px;
+            background-color: #1e88e5;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #1565c0;
+        }
+        button.secondary {
+            background-color: #78909c;
+        }
+        button.secondary:hover {
+            background-color: #546e7a;
+        }
+        .input-form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 500px;
+            color: #333;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .input-toggle {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+            margin-right: 10px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #1e88e5;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin: 15px 0;
+        }
+        .camera-feed {
+            width: 100%;
+            height: 300px;
+            background-color: #333;
+            margin: 15px 0;
+            display: none;
+        }
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .loading-spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #1e88e5;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .hidden {
+            display: none;
+        }
+        #voiceInput {
+            display: flex;
+            align-items: center;
+            margin-top: 15px;
+        }
+        #voiceInput button {
+            padding: 10px;
+            margin-right: 10px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #e53935;
+        }
+        #voiceStatus {
+            font-style: italic;
+        }
+        .progress-container {
+            width: 100%;
+            margin-top: 30px;
+        }
+        .progress-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        .progress-step {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background-color: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: white;
+        }
+        .progress-step.active {
+            background-color: #1e88e5;
+        }
+        .progress-step.completed {
+            background-color: #4caf50;
+        }
+        .progress-line {
+            height: 4px;
+            flex-grow: 1;
+            background-color: #ddd;
+            margin-top: 12px;
+        }
+        .progress-line.active {
+            background-color: #1e88e5;
+        }
+        .reference-number {
+            font-size: 18px;
+            font-weight: bold;
+            background-color: #e3f2fd;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 15px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="video-container">
+            <video id="mainVideo" controls>
+                <source src="vdo_generation/welcome_intro.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            
+            <!-- Progress Bar -->
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-step active">1</div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step">2</div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step">3</div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step">4</div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step">5</div>
+                </div>
+            </div>
+            
+            <!-- Welcome Overlay -->
+            <div id="welcomeOverlay" class="overlay">
+                <h2>Welcome to Virtual Loan Center</h2>
+                <p>We'll guide you through the loan application process step by step.</p>
+                <div class="controls">
+                    <button onclick="startApplication()">Start Application</button>
+                </div>
+            </div>
+            
+            <!-- Loan Type Selection Overlay -->
+            <div id="loanTypeOverlay" class="overlay">
+                <h2>Select Loan Type</h2>
+                <p>Please choose the type of loan you're interested in:</p>
+                <div class="controls">
+                    <button onclick="selectLoanType('personal')">Personal Loan</button>
+                    <button onclick="selectLoanType('home')">Home Loan</button>
+                    <button onclick="selectLoanType('auto')">Auto Loan</button>
+                </div>
+            </div>
+            
+            <!-- Personal Loan Details Overlay -->
+            <div id="personalLoanOverlay" class="overlay">
+                <div class="input-form">
+                    <h2>Personal Loan Details</h2>
+                    
+                    <div class="input-toggle">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="inputTypeToggle" onchange="toggleInputMethod()">
+                            <span class="slider"></span>
+                        </label>
+                        <span>I prefer typing my responses</span>
+                    </div>
+                    
+                    <div id="personalLoanForm">
+                        <label for="loanAmount">Loan Amount (₹50,000 - ₹20 lakhs):</label>
+                        <input type="number" id="loanAmount" min="50000" max="2000000">
+                        
+                        <label for="loanPurpose">Loan Purpose:</label>
+                        <select id="loanPurpose">
+                            <option value="">Select purpose</option>
+                            <option value="wedding">Wedding Expenses</option>
+                            <option value="medical">Medical Bills</option>
+                            <option value="education">Education</option>
+                            <option value="debt">Debt Consolidation</option>
+                            <option value="home">Home Renovation</option>
+                            <option value="other">Other</option>
+                        </select>
+                        
+                        <label for="loanTenure">Loan Tenure (months):</label>
+                        <select id="loanTenure">
+                            <option value="">Select tenure</option>
+                            <option value="12">12 months (1 year)</option>
+                            <option value="24">24 months (2 years)</option>
+                            <option value="36">36 months (3 years)</option>
+                            <option value="48">48 months (4 years)</option>
+                            <option value="60">60 months (5 years)</option>
+                        </select>
+                    </div>
+                    
+                    <div id="voiceInput" class="hidden">
+                        <button id="voiceButton" onclick="startVoiceRecognition()">
+                            <i>🎤</i>
+                        </button>
+                        <div id="voiceStatus">Click the microphone to speak</div>
+                    </div>
+                    
+                    <div class="controls">
+                        <button onclick="submitLoanDetails('personal')">Continue</button>
+                        <button class="secondary" onclick="goBack()">Back</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Home Loan Details Overlay -->
+            <div id="homeLoanOverlay" class="overlay">
+                <div class="input-form">
+                    <h2>Home Loan Details</h2>
+                    
+                    <div class="input-toggle">
+                        <label class="toggle-switch">
+                            <input type="checkbox" onchange="toggleInputMethod()">
+                            <span class="slider"></span>
+                        </label>
+                        <span>I prefer typing my responses</span>
+                    </div>
+                    
+                    <div id="homeLoanForm">
+                        <label for="propertyType">Property Type:</label>
+                        <select id="propertyType">
+                            <option value="">Select property type</option>
+                            <option value="flat">Flat/Apartment</option>
+                            <option value="house">Independent House</option>
+                            <option value="plot">Plot of Land</option>
+                        </select>
+                        
+                        <label for="propertyValue">Approximate Property Value (₹):</label>
+                        <input type="number" id="propertyValue">
+                        
+                        <label for="homeLoanAmount">Required Loan Amount (₹):</label>
+                        <input type="number" id="homeLoanAmount">
+                        
+                        <label for="homeLoanTenure">Loan Tenure (years):</label>
+                        <select id="homeLoanTenure">
+                            <option value="">Select tenure</option>
+                            <option value="5">5 years</option>
+                            <option value="10">10 years</option>
+                            <option value="15">15 years</option>
+                            <option value="20">20 years</option>
+                            <option value="25">25 years</option>
+                            <option value="30">30 years</option>
+                        </select>
+                    </div>
+                    
+                    <div class="controls">
+                        <button onclick="submitLoanDetails('home')">Continue</button>
+                        <button class="secondary" onclick="goBack()">Back</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Auto Loan Details Overlay -->
+            <div id="autoLoanOverlay" class="overlay">
+                <div class="input-form">
+                    <h2>Auto Loan Details</h2>
+                    
+                    <div class="input-toggle">
+                        <label class="toggle-switch">
+                            <input type="checkbox" onchange="toggleInputMethod()">
+                            <span class="slider"></span>
+                        </label>
+                        <span>I prefer typing my responses</span>
+                    </div>
+                    
+                    <div id="autoLoanForm">
+                        <label for="vehicleType">Vehicle Type:</label>
+                        <select id="vehicleType">
+                            <option value="">Select vehicle type</option>
+                            <option value="new">New Vehicle</option>
+                            <option value="used">Used Vehicle</option>
+                        </select>
+                        
+                        <label for="vehicleModel">Make and Model:</label>
+                        <input type="text" id="vehicleModel">
+                        
+                        <label for="vehiclePrice">On-road Price (₹):</label>
+                        <input type="number" id="vehiclePrice">
+                        
+                        <label for="autoLoanAmount">Required Loan Amount (₹):</label>
+                        <input type="number" id="autoLoanAmount">
+                        
+                        <label for="autoLoanTenure">Loan Tenure (years):</label>
+                        <select id="autoLoanTenure">
+                            <option value="">Select tenure</option>
+                            <option value="1">1 year</option>
+                            <option value="2">2 years</option>
+                            <option value="3">3 years</option>
+                            <option value="4">4 years</option>
+                            <option value="5">5 years</option>
+                            <option value="6">6 years</option>
+                            <option value="7">7 years</option>
+                        </select>
+                    </div>
+                    
+                    <div class="controls">
+                        <button onclick="submitLoanDetails('auto')">Continue</button>
+                        <button class="secondary" onclick="goBack()">Back</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Identity Verification Overlay -->
+            <div id="identityVerificationOverlay" class="overlay">
+                <h2>Identity Verification</h2>
+                <p>Please look directly at your camera for verification.</p>
+                
+                <div class="camera-feed" id="cameraFeed"></div>
+                
+                <div class="controls">
+                    <button onclick="startCamera()">Begin Verification</button>
+                    <button class="secondary" onclick="goBack()">Back</button>
+                </div>
+            </div>
+            
+            <!-- Income Verification Overlay -->
+            <div id="incomeVerificationOverlay" class="overlay">
+                <div class="input-form">
+                    <h2>Income Verification</h2>
+                    
+                    <div class="input-toggle">
+                        <label class="toggle-switch">
+                            <input type="checkbox" onchange="toggleInputMethod()">
+                            <span class="slider"></span>
+                        </label>
+                        <span>I prefer typing my responses</span>
+                    </div>
+                    
+                    <div id="incomeForm">
+                        <label for="employmentType">Employment Type:</label>
+                        <select id="employmentType">
+                            <option value="">Select type</option>
+                            <option value="salaried">Salaried</option>
+                            <option value="self-employed">Self-employed</option>
+                        </select>
+                        
+                        <label for="monthlyIncome">Monthly Income (₹):</label>
+                        <input type="number" id="monthlyIncome">
+                        
+                        <label for="employmentYears">Years in Current Job/Business:</label>
+                        <input type="number" id="employmentYears" min="0" step="0.5">
+                        
+                        <label for="existingEmi">Existing Loan EMIs (₹/month):</label>
+                        <input type="number" id="existingEmi" value="0">
+                    </div>
+                    
+                    <div class="controls">
+                        <button onclick="submitIncomeDetails()">Continue</button>
+                        <button class="secondary" onclick="goBack()">Back</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Document Collection Overlay -->
+            <div id="documentCollectionOverlay" class="overlay">
+                <div class="input-form">
+                    <h2>Document Collection</h2>
+                    <p>Please upload the following documents:</p>
+                    
+                    <div class="upload-area" id="panCardUpload">
+                        <h3>PAN Card</h3>
+                        <input type="file" id="panCard" accept="image/*">
+                        <button onclick="uploadDocument('panCard')">Upload</button>
+                    </div>
+                    
+                    <div class="upload-area" id="aadhaarUpload">
+                        <h3>Aadhaar Card</h3>
+                        <input type="file" id="aadhaar" accept="image/*">
+                        <button onclick="uploadDocument('aadhaar')">Upload</button>
+                    </div>
+                    
+                    <div class="upload-area" id="photoUpload">
+                        <h3>Recent Photograph</h3>
+                        <input type="file" id="photo" accept="image/*">
+                        <button onclick="uploadDocument('photo')">Upload</button>
+                    </div>
+                    
+                    <div class="controls">
+                        <button id="docContinueBtn" disabled onclick="continueAfterDocuments()">Continue</button>
+                        <button class="secondary" onclick="goBack()">Back</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Auto Doc Overlay -->
+            <div id="autoDocOverlay" class="overlay">
+                <div class="input-form">
+                    <h2>Vehicle Documents</h2>
+                    <p>Please upload the following vehicle documents:</p>
+                    
+                    <div class="upload-area" id="invoiceUpload">
+                        <h3>Proforma Invoice/RC Book</h3>
+                        <input type="file" id="vehicleDoc" accept="image/*,application/pdf">
+                        <button onclick="uploadDocument('vehicleDoc')">Upload</button>
+                    </div>
+                    
+                    <div class="upload-area" id="insuranceUpload">
+                        <h3>Insurance Details</h3>
+                        <input type="file" id="insuranceDoc" accept="image/*,application/pdf">
+                        <button onclick="uploadDocument('insuranceDoc')">Upload</button>
+                    </div>
+                    
+                    <div class="upload-area" id="quotationUpload">
+                        <h3>Vehicle Quotation</h3>
+                        <input type="file" id="quotationDoc" accept="image/*,application/pdf">
+                        <button onclick="uploadDocument('quotationDoc')">Upload</button>
+                    </div>
+                    
+                    <div class="controls">
+                        <button id="autoDocContinueBtn" disabled onclick="continueAfterAutoDocuments()">Continue</button>
+                        <button class="secondary" onclick="goBack()">Back</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Eligibility Check Overlay -->
+            <div id="eligibilityCheckOverlay" class="overlay">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <h2>Checking Eligibility</h2>
+                    <p>Please wait while we process your application...</p>
+                </div>
+            </div>
+            
+            <!-- Approval Overlay -->
+            <div id="approvalOverlay" class="overlay">
+                <h2>Loan Approved!</h2>
+                <div class="input-form">
+                    <h3>Loan Offer Details:</h3>
+                    <p><strong>Approved Amount:</strong> ₹10,00,000</p>
+                    <p><strong>Interest Rate:</strong> 10.5% per annum</p>
+                    <p><strong>Tenure:</strong> 5 years</p>
+                    <p><strong>Monthly EMI:</strong> ₹21,465</p>
+                    <p><strong>Processing Fee:</strong> ₹10,000</p>
+                    
+                    <div class="controls">
+                        <button onclick="acceptOffer()">Accept Offer</button>
+                        <button class="secondary" onclick="rejectOffer()">Reject Offer</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Rejected Overlay -->
+            <div id="rejectedOverlay" class="overlay">
+                <h2>Application Status</h2>
+                <div class="input-form">
+                    <p>After careful review of your application, we are unable to approve your loan request at this time.</p>
+                    <p><strong>Reasons:</strong> Low credit score of 580 and high existing financial commitments.</p>
+                    <p>You may reapply after 6 months once your financial situation improves.</p>
+                    
+                    <div class="controls">
+                        <button onclick="showAlternatives()">Show Alternatives</button>
+                        <button class="secondary" onclick="endApplication()">End Application</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Alternatives Overlay -->
+            <div id="alternativesOverlay" class="overlay">
+                <h2>Alternative Options</h2>
+                <div class="input-form">
+                    <p>Here are some alternatives that might work better for your situation:</p>
+                    <div class="controls">
+                        <button onclick="selectAlternative('lower')">Lower Loan Amount (₹5,00,000)</button>
+                        <button onclick="selectAlternative('different')">Different Loan Product</button>
+                        <button onclick="selectAlternative('secured')">Secured Loan Option</button>
+                        <button onclick="selectAlternative('credit')">Credit Builder Products</button>
+                        <button class="secondary" onclick="endApplication()">End Application</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Acceptance Next Steps Overlay -->
+            <div id="acceptanceNextOverlay" class="overlay">
+                <h2>Congratulations!</h2>
+                <div class="input-form">
+                    <p>Here are the next steps:</p>
+                    <ol>
+                        <li>Digital signature: You'll receive a secure link to sign your loan agreement digitally</li>
+                        <li>Bank verification: We'll conduct a quick verification call within 24 hours</li>
+                        <li>Disbursement: Once verified, your loan will be disbursed directly to your account within 2 business days</li>
+                    </ol>
+                    
+                    <div class="reference-number">
+                        Application Reference: XXXXXXXRJ45NBXXX235
+                    </div>
+                    
+                    <div class="controls">
+                        <button onclick="completeApplication()">Complete Application</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Application Complete Overlay -->
+            <div id="applicationCompleteOverlay" class="overlay">
+                <h2>Application Complete</h2>
+                <div class="input-form">
+                    <p>Thank you for completing your loan application with LoanBuddy.</p>
+                    <p>Your application has been successfully submitted, and you will receive updates via SMS and email.</p>
+                    
+                    <div class="reference-number">
+                        Application Reference: XXXXXXXRJ45NBXXX235
+                    </div>
+                    
+                    <p>If you have any questions or need assistance, our customer service team is available 24/7 at 1800 452 236 842 or via email at loanbuddy25@gmail.com.</p>
+                    
+                    <div class="controls">
+                        <button onclick="exitApplication()">Exit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variables to store application data
+        let applicationData = {
+            loanType: '',
+            loanDetails: {},
+            incomeDetails: {},
+            documents: {},
+            approved: false,
+            referenceNumber: 'XXXXXXXRJ45NBXXX235'
+        };
+        
+        const video = document.getElementById('mainVideo');
+        let currentStep = 'welcome_intro';
+        let previousStep = '';
+        let uploadedDocuments = {
+            panCard: false,
+            aadhaar: false,
+            photo: false
+        };
+        let uploadedAutoDocuments = {
+            vehicleDoc: false,
+            insuranceDoc: false,
+            quotationDoc: false
+        };
+        
+        // Initialize speech recognition
+        let recognition = null;
+        if ('webkitSpeechRecognition' in window) {
+            recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = true;
+            
+            recognition.onresult = function(event) {
+                let transcript = '';
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    transcript += event.results[i][0].transcript;
+                }
+                document.getElementById('voiceStatus').textContent = transcript;
+            };
+            
+            recognition.onend = function() {
+                document.getElementById('voiceButton').style.backgroundColor = '#e53935';
+                document.getElementById('voiceStatus').textContent = 'Voice input captured';
+            };
+        }
+        
+        // Video event listeners
+        video.addEventListener('ended', function() {
+            handleVideoEnd();
+        });
+        
+        function handleVideoEnd() {
+            switch(currentStep) {
+                case 'vdo_generation/welcome_intro':
+                    showOverlay('welcomeOverlay');
+                    break;
+                case 'vdo_generation/loan_type':
+                    showOverlay('loanTypeOverlay');
+                    break;
+                case 'vdo_generation/personal_loan':
+                    showOverlay('personalLoanOverlay');
+                    break;
+                case 'vdo_generation/home_loan':
+                    showOverlay('homeLoanOverlay');
+                    break;
+                case 'vdo_generation/auto_loan':
+                    showOverlay('autoLoanOverlay');
+                    break;
+                case 'vdo_generation/identity_verification':
+                    showOverlay('identityVerificationOverlay');
+                    break;
+                case 'vdo_generation/income_verification':
+                    showOverlay('incomeVerificationOverlay');
+                    break;
+                case 'vdo_generation/document_collection':
+                    showOverlay('documentCollectionOverlay');
+                    break;
+                case 'vdo_generation/auto_doc':
+                    showOverlay('autoDocOverlay');
+                    break;
+                case 'vdo_generation/eligibility_check':
+                    showOverlay('eligibilityCheckOverlay');
+                    setTimeout(() => {
+                        // Simulate approval/rejection decision
+                        if (Math.random() > 0.5) {
+                            applicationData.approved = true;
+                            playVideo('vdo_generation/approved.mp4', 'approved');
+                        } else {
+                            applicationData.approved = false;
+                            playVideo('vdo_generation/rejected.mp4', 'rejected');
+                        }
+                    }, 5000);
+                    break;
+                case 'vdo_generation/approved':
+                    showOverlay('approvalOverlay');
+                    break;
+                case 'vdo_generation/rejected':
+                    showOverlay('rejectedOverlay');
+                    break;
+                case 'vdo_generation/alternatives':
+                    showOverlay('alternativesOverlay');
+                    break;
+                case 'vdo_generation/acceptance_nxt':
+                    showOverlay('acceptanceNextOverlay');
+                    break;
+                case 'vdo_generation/appl_complete':
+                    showOverlay('applicationCompleteOverlay');
+                    break;
+                default:
+                    console.log('No handler for this step:', currentStep);
+            }
+            
+            updateProgressBar();
+        }
+        
+        // Helper functions
+        function showOverlay(overlayId) {
+            // Hide all overlays first
+            const overlays = document.querySelectorAll('.overlay');
+            overlays.forEach(overlay => {
+                overlay.style.display = 'none';
+            });
+            
+            // Show requested overlay
+            document.getElementById(overlayId).style.display = 'flex';
+        }
+        
+        function playVideo(videoSrc, nextStep) {
+            previousStep = currentStep;
+            
+            // Extract just the filename without extension if using full paths
+            if (videoSrc.includes('/')) {
+                const parts = videoSrc.split('/');
+                const filename = parts[parts.length - 1].split('.')[0];
+                currentStep = filename;
+            } else {
+                currentStep = nextStep;
+            }
+            
+            // Hide all overlays
+            const overlays = document.querySelectorAll('.overlay');
+            overlays.forEach(overlay => {
+                overlay.style.display = 'none';
+            });
+            
+            // Play the video
+            video.src = videoSrc;
+            video.play();
+        }
+        
+        
+        function updateProgressBar() {
+            const steps = ['vdo_generation/welcome_intro', 'vdo_generation/loan_type', 'vdo_generation/personal_loan', 'vdo_generation/home_loan', 'vdo_generation/auto_loan',
+                        'vdo_generation/identity_verification', 'vdo_generation/income_verification', 'vdo_generation/document_collection',
+                        'vdo_generation/auto_doc', 'vdo_generation/eligibility_check', 'vdo_generation/approved', 'vdo_generation/rejected',
+                        'vdo_generation/alternatives', 'vdo_generation/acceptance_nxt', 'vdo_generation/application_complete'];
+
+            // Get progress elements
+            const progressSteps = document.querySelectorAll('.progress-step');
+            const progressLines = document.querySelectorAll('.progress-line');
+
+            // Reset all progress steps
+            progressSteps.forEach(step => step.classList.remove('active', 'completed'));
+            progressLines.forEach(line => line.classList.remove('active'));
+
+            // Calculate current progress index
+            let progressIndex = steps.indexOf(currentStep);
+
+            if (progressIndex !== -1) {
+                for (let i = 0; i <= progressIndex; i++) {
+                    if (progressSteps[i]) {
+                        progressSteps[i].classList.add(i === progressIndex ? 'active' : 'completed');
+                    }
+                    if (progressLines[i - 1]) {
+                        progressLines[i - 1].classList.add('active');
+                    }
+                }
+            }
+        }
