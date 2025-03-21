@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LoanMate - Your Digital Branch Manager</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <div class="logo-container">
+                <div class="logo">LoanMate</div>
+                <div class="tagline">Your Digital Branch Manager</div>
+            </div>
+            <div class="header-actions">
+                <button class="help-button">
+                    <i class="fas fa-question-circle"></i> Help & Support
+                </button>
+            </div>
+        </header>
+
+        <main id="app-content">
+            <!-- Welcome Screen - Initially visible -->
+            <section id="welcome-screen" class="screen active">
+                <div class="video-container">
+                    <div class="video-placeholder">
+                        <div class="avatar-container">
+                            <div class="avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                        </div>
+                        <div class="video-text">
+                            <h3>Meet Maya, Your AI Branch Manager</h3>
+                            <p>"Hello, I'm Maya from LoanMate. I'll guide you through the entire loan application process."</p>
+                        </div>
+                        <div class="video-controls">
+                            <button class="play-button"><i class="fas fa-play"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="action-container">
+                    <button id="start-application" class="primary-button">Start Application</button>
+                    <button class="text-button">Learn more about our loan process</button>
+                </div>
+                <div class="terms-text">
+                    By continuing, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                </div>
+            </section>
+
+            <!-- Onboarding Screen -->
+            <section id="onboarding-screen" class="screen">
+                <div class="progress-container">
+                    <div class="progress-info">
+                        <span class="step-title">Getting Started</span>
+                        <span class="step-count">Step 1 of 6</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 16.6%;"></div>
+                    </div>
+                </div>
+
+                <div class="video-container">
+                    <div class="video-placeholder">
+                        <div class="video-text">
+                            <h3>Maya explaining the process</h3>
+                            <p>"Before we begin, I'll need your permission to record our conversation and process your documents."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="consent-container">
+                    <h3>Consent Requirements</h3>
+                    <div class="consent-options">
+                        <label class="consent-label">
+                            <input type="checkbox" class="consent-checkbox" data-consent="videoRecording">
+                            <span>I agree to video recording during this application for identity verification purposes</span>
+                        </label>
+                        <label class="consent-label">
+                            <input type="checkbox" class="consent-checkbox" data-consent="documentScanning">
+                            <span>I consent to document scanning and verification of my identification documents</span>
+                        </label>
+                        <label class="consent-label">
+                            <input type="checkbox" class="consent-checkbox" data-consent="dataUsage">
+                            <span>I understand my data will be used for loan assessment and stored securely</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="navigation-buttons">
+                    <button class="back-button">Back</button>
+                    <button id="continue-to-verification" class="primary-button" disabled>Continue</button>
+                </div>
+            </section>
+
+            <!-- Verification Screen -->
+            <section id="verification-screen" class="screen">
+                <div class="progress-container">
+                    <div class="progress-info">
+                        <span class="step-title">Identity Verification</span>
+                        <span class="step-count">Step 2 of 6</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 33.2%;"></div>
+                    </div>
+                </div>
+
+                <div class="verification-container">
+                    <div class="verification-left">
+                        <div class="video-placeholder small">
+                            <div class="video-text">
+                                <h3>Maya providing instructions</h3>
+                                <p>"Please look directly at the camera and follow the prompts for facial verification"</p>
+                            </div>
+                        </div>
+                        
+                        <div class="verification-steps">
+                            <h3>Verification Steps</h3>
+                            <ul class="step-list">
+                                <li class="step completed">
+                                    <i class="fas fa-check-circle"></i>
+                                    Face aligned in frame
+                                </li>
+                                <li class="step pending">
+                                    <i class="far fa-circle"></i>
+                                    Blink verification
+                                </li>
+                                <li class="step pending">
+                                    <i class="far fa-circle"></i>
+                                    Turn head slightly left
+                                </li>
+                                <li class="step pending">
+                                    <i class="far fa-circle"></i>
+                                    Turn head slightly right
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="verification-right">
+                        <div class="camera-feed">
+                            <div class="face-outline"></div>
+                            <div class="camera-message">Position your face within the circle</div>
+                        </div>
+                        
+                        <div class="verification-actions">
+                            <button class="text-button">Need Help?</button>
+                            <button id="continue-to-documents" class="primary-button">Verify</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Document Submission Screen -->
+            <section id="document-screen" class="screen">
+                <div class="progress-container">
+                    <div class="progress-info">
+                        <span class="step-title">Document Verification</span>
+                        <span class="step-count">Step 3 of 6</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 49.8%;"></div>
+                    </div>
+                </div>
+
+                <div class="video-container">
+                    <div class="video-placeholder">
+                        <div class="video-text">
+                            <h3>Maya explaining document requirements</h3>
+                            <p>"Please upload clear images of your documents for verification."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="document-container">
+                    <div class="document-tabs">
+                        <button class="document-tab active" data-tab="id">ID Proof (Aadhaar/PAN)</button>
+                        <button class="document-tab" data-tab="income">Income Proof</button>
+                        <button class="document-tab" data-tab="address">Address Proof</button>
+                    </div>
+                    
+                    <div class="document-content">
+                        <div class="document-upload">
+                            <div class="upload-icon">
+                                <i class="fas fa-camera"></i>
+                            </div>
+                            <h3>Upload your document</h3>
+                            <p>Position document within frame or upload image</p>
+                            <div class="upload-actions">
+                                <button class="upload-button camera">
+                                    <i class="fas fa-camera"></i> Take Photo
+                                </button>
+                                <button class="upload-button file">
+                                    <i class="fas fa-upload"></i> Upload File
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- This will be shown after upload -->
+                        <div class="document-preview" style="display: none;">
+                            <div class="preview-image">
+                                <!-- Preview image will be displayed here -->
+                            </div>
+                            <div class="extracted-data">
+                                <h4>Extracted Information</h4>
+                                <div class="data-field">
+                                    <label>Name:</label>
+                                    <input type="text" value="John Doe">
+                                </div>
+                                <div class="data-field">
+                                    <label>ID Number:</label>
+                                    <input type="text" value="ABCDE1234F">
+                                </div>
+                                <div class="data-field">
+                                    <label>Date of Birth:</label>
+                                    <input type="text" value="01/01/1990">
+                                </div>
+                                <button class="edit-button">Edit Information</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="navigation-buttons">
+                    <button class="back-button">Back</button>
+                    <button class="primary-button">Continue</button>
+                </div>
+            </section>
+
+            <!-- More screens will be added here -->
+
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
