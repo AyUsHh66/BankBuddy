@@ -26,20 +26,10 @@
             <!-- Welcome Screen - Initially visible -->
             <section id="welcome-screen" class="screen active">
                 <div class="video-container">
-                    <div class="video-placeholder">
-                        <div class="avatar-container">
-                            <div class="avatar">
-                                <i class="fas fa-user"></i>
-                            </div>
-                        </div>
-                        <div class="video-text">
-                            <h3>Meet Maya, Your AI Branch Manager</h3>
-                            <p>"Hello, I'm Maya from LoanMate. I'll guide you through the entire loan application process."</p>
-                        </div>
-                        <div class="video-controls">
-                            <button class="play-button"><i class="fas fa-play"></i></button>
-                        </div>
-                    </div>
+                    <video id="intro-video" width="640" height="480" controls autoplay muted>
+                        <source src="../Generated_vdo's/welcome_intro.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
                 </div>
                 <div class="action-container">
                     <button id="start-application" class="primary-button">Start Application</button>
@@ -49,6 +39,7 @@
                     By continuing, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
                 </div>
             </section>
+            
 
             <!-- Onboarding Screen -->
             <section id="onboarding-screen" class="screen">
