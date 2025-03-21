@@ -61,7 +61,7 @@ Welcome to the Financial Interaction Application! This innovative platform is de
 - **ID Verification**: Ensure submitted IDs (e.g., Aadhaar, PAN) are valid and not random.
 - **Session Timeout**: Automatic termination of the session after 5-7 minutes of inactivity.
 
-### Addressing User Pain Points
+### Addressing The User Pain Points
 
 - **Long or Repetitive Interactions**: Introduce a skill-edit option for users who prefer text-based responses.
 - **Poor Lighting/Image Quality**: Implement a manual verification fallback for document submissions.
